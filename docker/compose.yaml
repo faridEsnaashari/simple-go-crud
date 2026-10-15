@@ -1,0 +1,41 @@
+name: list
+version: '3.8'
+
+networks:
+  list-mysql-network:
+    external: true
+
+services:
+  mysql:
+    container_name: list-mysql
+    image: mysql:8.0.30
+    restart: always
+    volumes:
+      - ./mysql/container-data/data:/var/lib/mysql
+      - ./mysql/container-data/conf/mysqld.conf:/etc/mysql/mysql.conf.d/mysqld.cnf
+    ports:
+      - '3309:3306'
+    networks:
+      - list-mysql-network
+    env_file:
+      - .env
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MYSQL_PASSWORD}
+      - TZ=Asia/Tehran
+    command:
+      - --default-authentication-plugin=mysql_native_password
+
+  phpmyadmin:
+    container_name: list-phpmyadmin
+    image: phpmyadmin:5.1-apache
+    restart: always
+    ports:
+      - '8084:80'
+    networks:
+      - list-mysql-network
+    depends_on:
+      - mysql
+    env_file:
+      - .env
+    environment:
+      - PMA_HOST=${MYSQL_HOST}
