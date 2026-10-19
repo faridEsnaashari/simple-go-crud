@@ -1,33 +1,52 @@
 package main
 
 import (
-	"fmt"
-	"log"
+	"context"
 	"net/http"
+	"os"
+	"time"
 
 	"a.com/test/internal/database"
+	logx "a.com/test/internal/httpx/logs"
 	"a.com/test/internal/httpx/middlewares"
 	"a.com/test/internal/list"
 	"github.com/joho/godotenv"
 )
 
 func main() {
+	logx.InitLogger()
+
 	if err := godotenv.Load(); err != nil {
-		log.Fatal(err)
+		logx.Error("MAIN_ENV_EXCEPTION", "err", err)
+	}
+
+	ctx := context.Background()
+
+	_, dbErr := database.Open(ctx)
+	if dbErr != nil {
+		logx.Error("MAIN_DATABASE_ERROR", "err", dbErr)
+		os.Exit(1)
 	}
 
 	mux := http.NewServeMux()
-
-	database.Open(database.GetDatabaseConfigs())
 
 	mux.HandleFunc("GET /list", middlewares.Config(list.ReadAllListHandler))
 	mux.HandleFunc("POST /list", middlewares.Config(list.SaveListHandler))
 	mux.HandleFunc("PUT /list/{id}", middlewares.Config(list.UpdateListHandler))
 	mux.HandleFunc("DELETE /list/{id}", middlewares.Config(list.DeleteListHandler))
 
-	fmt.Println("running")
-	fmt.Println(database.GetDatabaseConfigs())
-	err := http.ListenAndServe(":8000", mux)
-	fmt.Println(err)
+	logx.InfoString("MAIN", "running")
+	server := http.Server{
+		Addr:              ":8000",
+		Handler:           mux,
+		ReadHeaderTimeout: 60 * time.Second,
+	}
+
+	err := server.ListenAndServe()
+
+	if err != nil {
+		logx.Error("MAIN_SERVER_ERROR", "err", err)
+		os.Exit(1)
+	}
 
 }

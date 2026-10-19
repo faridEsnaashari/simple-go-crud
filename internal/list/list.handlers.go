@@ -1,18 +1,18 @@
 package list
 
 import (
+	"net/http"
 	"strconv"
 
 	dtox "a.com/test/internal/httpx/dto"
 	errorx "a.com/test/internal/httpx/errors"
-	"a.com/test/internal/httpx/middlewares"
 )
 
-func ReadAllListHandler(req middlewares.Request) ([]List, errorx.HandledError) {
+func ReadAllListHandler(req *http.Request) ([]List, errorx.HandledError) {
 	return ReadAllListService(), errorx.HandledError{}
 }
 
-func SaveListHandler(req middlewares.Request) (List, errorx.HandledError) {
+func SaveListHandler(req *http.Request) (List, errorx.HandledError) {
 	var l CreateListDto
 
 	data, err := dtox.ValidateDto(req.Body, l, dtox.BodyParser)
@@ -24,7 +24,7 @@ func SaveListHandler(req middlewares.Request) (List, errorx.HandledError) {
 	return SaveListService(data), errorx.HandledError{}
 }
 
-func UpdateListHandler(req middlewares.Request) (List, errorx.HandledError) {
+func UpdateListHandler(req *http.Request) (List, errorx.HandledError) {
 	var l UpdateListDto
 
 	id, pathError := dtox.PathParser(req.PathValue("id"))
@@ -45,7 +45,7 @@ func UpdateListHandler(req middlewares.Request) (List, errorx.HandledError) {
 
 }
 
-func DeleteListHandler(req middlewares.Request) (any, errorx.HandledError) {
+func DeleteListHandler(req *http.Request) (any, errorx.HandledError) {
 	id, _ := strconv.Atoi(req.PathValue("id"))
 
 	e := DeleteListService(id)

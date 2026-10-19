@@ -1,0 +1,35 @@
+version: "2"
+
+linters:
+  default: standard
+  enable:
+    - lll
+    - forbidigo
+  settings:
+    lll:
+      line-length: 120
+      tab-width: 4
+    forbidigo:
+      forbid:
+        - pattern: ^fmt\.Print(f|ln)?$
+          msg: use logx (a.com/test/internal/httpx/logs) so every log has an event name
+        - pattern: ^print(ln)?$
+          msg: use logx (a.com/test/internal/httpx/logs) so every log has an event name
+        - pattern: ^log\.
+          msg: use logx (a.com/test/internal/httpx/logs) so every log has an event name
+        - pattern: ^slog\.(Debug|Info|Warn|Error)(Context)?$
+          msg: use logx (a.com/test/internal/httpx/logs) so every log has an event name
+  exclusions:
+    rules:
+      - path: internal/httpx/logs/
+        linters:
+          - forbidigo
+
+formatters:
+  enable:
+    - gofumpt
+    - goimports
+  settings:
+    goimports:
+      local-prefixes:
+        - a.com/test

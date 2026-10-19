@@ -8,10 +8,10 @@ import (
 )
 
 func WithHandleError[T any](
-	f func(w http.ResponseWriter, r *http.Request) (T, errorx.HandledError),
+	f func(r *http.Request) (T, errorx.HandledError),
 ) func(w http.ResponseWriter, r *http.Request) Response {
 	return func(w http.ResponseWriter, r *http.Request) Response {
-		result, err := f(w, r)
+		result, err := f(r)
 
 		if err.ErrorStatus == http.StatusBadRequest {
 			return Response{
