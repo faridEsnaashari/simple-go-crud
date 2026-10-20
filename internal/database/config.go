@@ -15,7 +15,6 @@ type DatabaseConfig struct {
 }
 
 func GetDatabaseConfigs() (DatabaseConfig, error) {
-
 	mysqlPort, err := strconv.Atoi(os.Getenv("MYSQL_PORT"))
 	mysqlHost := os.Getenv("MYSQL_HOST")
 	mysqlPasswor := os.Getenv("MYSQL_PASSWORD")

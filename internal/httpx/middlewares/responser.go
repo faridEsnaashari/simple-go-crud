@@ -21,7 +21,6 @@ type Response struct {
 
 func WithResponser(f func(w http.ResponseWriter, r *http.Request) Response) func(w http.ResponseWriter, r *http.Request) Response {
 	return func(w http.ResponseWriter, r *http.Request) Response {
-
 		result := f(w, r)
 
 		status := http.StatusOK

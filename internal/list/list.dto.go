@@ -23,7 +23,8 @@ func (dto UpdateListDto) EnumValidation() *dtox.DtoValidationFailed {
 		return nil
 	}
 
-	err := dtox.DtoValidationFailed{}.EnumFailed("Status", []string{string(ListStatusCreated), string(ListStatusInProgress),
+	err := dtox.DtoValidationFailed{}.EnumFailed("Status", []string{
+		string(ListStatusCreated), string(ListStatusInProgress),
 		string(ListStatusDone),
 	},
 	)

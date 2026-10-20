@@ -15,7 +15,6 @@ type DtoValidationFailed struct {
 }
 
 func PathParser(path string) (int, DtoValidationFailed) {
-
 	data, parseError := strconv.Atoi(path)
 
 	if parseError != nil {
@@ -29,7 +28,6 @@ func PathParser(path string) (int, DtoValidationFailed) {
 }
 
 func BodyParser[D any](reqData io.Reader, data D) (D, DtoValidationFailed) {
-
 	parseError := json.NewDecoder(reqData).Decode(&data)
 
 	var zero D
@@ -55,7 +53,6 @@ func ValidateDto[D any](reqData io.Reader, dto D, parser func(io.Reader, D) (D, 
 	v := validator.New()
 
 	err := v.Struct(data)
-
 	if err != nil {
 		var validationErrors validator.ValidationErrors
 
@@ -96,5 +93,4 @@ func (dvf DtoValidationFailed) EnumFailed(field string, valids []string) DtoVali
 		Tag:   tag,
 		Field: field,
 	}
-
 }

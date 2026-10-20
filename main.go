@@ -6,11 +6,12 @@ import (
 	"os"
 	"time"
 
+	"github.com/joho/godotenv"
+
 	"a.com/test/internal/database"
 	logx "a.com/test/internal/httpx/logs"
 	"a.com/test/internal/httpx/middlewares"
 	"a.com/test/internal/list"
-	"github.com/joho/godotenv"
 )
 
 func main() {
@@ -43,10 +44,8 @@ func main() {
 	}
 
 	err := server.ListenAndServe()
-
 	if err != nil {
 		logx.Error("MAIN_SERVER_ERROR", "err", err)
 		os.Exit(1)
 	}
-
 }

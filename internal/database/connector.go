@@ -8,8 +8,9 @@ import (
 	"strconv"
 	"time"
 
-	logx "a.com/test/internal/httpx/logs"
 	"github.com/go-sql-driver/mysql"
+
+	logx "a.com/test/internal/httpx/logs"
 )
 
 func Open(ctx context.Context) (*sql.DB, error) {

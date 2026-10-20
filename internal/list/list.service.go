@@ -22,7 +22,6 @@ func UpdateListService(id int, dto UpdateListDto) (List, errorx.HandledError) {
 	})
 
 	return list, err
-
 }
 
 func DeleteListService(id int) errorx.HandledError {
