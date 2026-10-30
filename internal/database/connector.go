@@ -29,6 +29,7 @@ func Open(ctx context.Context) (*sql.DB, error) {
 	cfg.Timeout = 5 * time.Second      // dial timeout
 	cfg.ReadTimeout = 30 * time.Second // per-query read timeout
 	cfg.WriteTimeout = 30 * time.Second
+	cfg.ClientFoundRows = true
 
 	db, err := sql.Open("mysql", cfg.FormatDSN())
 	if err != nil {

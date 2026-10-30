@@ -1,58 +1,52 @@
 package list
 
 import (
-	"slices"
+	"context"
+	"fmt"
 
-	errorx "a.com/test/internal/httpx/errors"
+	"a.com/test/internal/database"
 )
 
-var lists []List
+func ReadAllListRepository(ctx context.Context) ([]List, error) {
+	repo := database.GetRepo()
+	items := []List{}
 
-func getLists() []List {
-	if len(lists) == 0 {
-		lists = []List{
-			{ID: 1, Title: "t1", Status: ListStatusCreated},
-			{ID: 2, Title: "t2", Status: ListStatusCreated},
-			{ID: 3, Title: "t3", Status: ListStatusCreated},
-		}
+	if err := repo.WithContext(ctx).Order("id").Find(&items).Error; err != nil {
+		return nil, err
 	}
 
-	return lists
+	return items, nil
 }
 
-func ReadAllListRepository() []List {
-	return getLists()
-}
+func SaveListRepository(ctx context.Context, l List) (List, error) {
+	repo := database.GetRepo()
 
-func SaveListRepository(l List) List {
-	lists = append(lists, l)
-	return l
-}
-
-func UpdateListRepository(id int, l List) (List, errorx.HandledError) {
-	index := slices.IndexFunc(lists, func(l List) bool {
-		return l.ID == id
-	})
-
-	if index == -1 {
-		return List{}, errorx.NotFoundError("list")
+	if err := repo.WithContext(ctx).Create(&l).Error; err != nil {
+		return List{}, err
 	}
 
-	lists[index] = l
-
-	return l, errorx.HandledError{}
+	return l, nil
 }
 
-func DeleteListRepository(id int) errorx.HandledError {
-	index := slices.IndexFunc(lists, func(l List) bool {
-		return l.ID == id
-	})
+func UpdateListRepository(ctx context.Context, id int, l List) (int, error) {
+	repo := database.GetRepo()
 
-	if index == -1 {
-		return errorx.NotFoundError("list")
+	r := repo.WithContext(ctx).Where("id = ?", id).Updates(&l).First(&l)
+	fmt.Println(l)
+
+	if r.Error != nil {
+		return 0, r.Error
 	}
 
-	lists = slices.Delete(lists, index, index+1)
+	return id, nil
+}
 
-	return errorx.HandledError{}
+func DeleteListRepository(ctx context.Context, id int) error {
+	repo := database.GetRepo()
+
+	if err := repo.WithContext(ctx).Where("id = ?", id).Delete(&List{}).Error; err != nil {
+		return err
+	}
+
+	return nil
 }

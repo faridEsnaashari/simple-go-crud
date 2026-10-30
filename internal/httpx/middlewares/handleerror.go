@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	errorx "a.com/test/internal/httpx/errors"
+	logx "a.com/test/internal/httpx/logs"
 )
 
 func WithHandleError[T any](
@@ -12,6 +13,10 @@ func WithHandleError[T any](
 ) func(w http.ResponseWriter, r *http.Request) Response {
 	return func(w http.ResponseWriter, r *http.Request) Response {
 		result, err := f(r)
+
+		if err.ErrorStatus == http.StatusInternalServerError {
+			logx.Error("INTERNAL_ERROR", "err", err)
+		}
 
 		if err.ErrorStatus == http.StatusBadRequest {
 			return Response{
@@ -24,7 +29,7 @@ func WithHandleError[T any](
 
 		if err.ErrorStatus != 0 {
 			return Response{
-				Data:       cmp.Or(err.Reason, "faield"),
+				Data:       cmp.Or(err.Message, "failed"),
 				Message:    cmp.Or(err.Message, "failed"),
 				Status:     FailedResponseStatus,
 				HttpStatus: err.ErrorStatus,

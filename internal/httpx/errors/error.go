@@ -30,3 +30,11 @@ func ValidationError(errors []dtox.DtoValidationFailed) HandledError {
 		DtoErrors:   errors,
 	}
 }
+
+func DatabaseError(err error) HandledError {
+	return HandledError{
+		ErrorStatus: http.StatusInternalServerError,
+		Reason:      "database error",
+		Message:     err.Error(),
+	}
+}

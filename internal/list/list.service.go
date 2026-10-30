@@ -1,29 +1,50 @@
 package list
 
 import (
+	"context"
+
 	errorx "a.com/test/internal/httpx/errors"
 )
 
-func ReadAllListService() []List {
-	return ReadAllListRepository()
+func ReadAllListService(ctx context.Context) ([]List, errorx.HandledError) {
+	r, e := ReadAllListRepository(ctx)
+	if e != nil {
+		return nil, errorx.DatabaseError(e)
+	}
+
+	return r, errorx.HandledError{}
 }
 
-func SaveListService(dto CreateListDto) List {
-	return SaveListRepository(List{
+func SaveListService(ctx context.Context, dto CreateListDto) (List, errorx.HandledError) {
+	r, e := SaveListRepository(ctx, List{
 		Title:  dto.Title,
 		Status: ListStatusCreated,
 	})
+
+	if e != nil {
+		return List{}, errorx.DatabaseError(e)
+	}
+
+	return r, errorx.HandledError{}
 }
 
-func UpdateListService(id int, dto UpdateListDto) (List, errorx.HandledError) {
-	list, err := UpdateListRepository(id, List{
+func UpdateListService(ctx context.Context, id int, dto UpdateListDto) (int, errorx.HandledError) {
+	r, e := UpdateListRepository(ctx, id, List{
 		Title:  dto.Title,
 		Status: dto.Status,
 	})
 
-	return list, err
+	if e != nil {
+		return 0, errorx.DatabaseError(e)
+	}
+
+	return r, errorx.HandledError{}
 }
 
-func DeleteListService(id int) errorx.HandledError {
-	return DeleteListRepository(id)
+func DeleteListService(ctx context.Context, id int) errorx.HandledError {
+	e := DeleteListRepository(ctx, id)
+	if e != nil {
+		return errorx.DatabaseError(e)
+	}
+	return errorx.HandledError{}
 }

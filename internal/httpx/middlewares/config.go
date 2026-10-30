@@ -7,8 +7,8 @@ import (
 )
 
 func Config[T any](fn func(r *http.Request) (T, errorx.HandledError)) func(w http.ResponseWriter, r *http.Request) {
-	withValid := WithHandleError(fn)
-	withRes := WithResponser(withValid)
+	withHandled := WithHandleError(fn)
+	withRes := WithResponser(withHandled)
 	withLog := WithLogger(withRes)
 
 	return withLog

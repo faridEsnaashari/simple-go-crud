@@ -9,7 +9,7 @@ import (
 )
 
 func ReadAllListHandler(req *http.Request) ([]List, errorx.HandledError) {
-	return ReadAllListService(), errorx.HandledError{}
+	return ReadAllListService(req.Context())
 }
 
 func SaveListHandler(req *http.Request) (List, errorx.HandledError) {
@@ -20,24 +20,24 @@ func SaveListHandler(req *http.Request) (List, errorx.HandledError) {
 		return List{}, errorx.ValidationError(err)
 	}
 
-	return SaveListService(data), errorx.HandledError{}
+	return SaveListService(req.Context(), data)
 }
 
-func UpdateListHandler(req *http.Request) (List, errorx.HandledError) {
+func UpdateListHandler(req *http.Request) (int, errorx.HandledError) {
 	var l UpdateListDto
 
 	id, pathError := dtox.PathParser(req.PathValue("id"))
 
 	if pathError.Field != "" {
-		return List{}, errorx.ValidationError([]dtox.DtoValidationFailed{pathError})
+		return 0, errorx.ValidationError([]dtox.DtoValidationFailed{pathError})
 	}
 
 	data, err := dtox.ValidateDto(req.Body, l, dtox.BodyParser)
 	if err != nil {
-		return List{}, errorx.ValidationError(err)
+		return 0, errorx.ValidationError(err)
 	}
 
-	r, e := UpdateListService(id, data)
+	r, e := UpdateListService(req.Context(), id, data)
 
 	return r, e
 }
@@ -45,6 +45,6 @@ func UpdateListHandler(req *http.Request) (List, errorx.HandledError) {
 func DeleteListHandler(req *http.Request) (any, errorx.HandledError) {
 	id, _ := strconv.Atoi(req.PathValue("id"))
 
-	e := DeleteListService(id)
+	e := DeleteListService(req.Context(), id)
 	return nil, e
 }

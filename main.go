@@ -2,12 +2,14 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"os"
 	"time"
 
 	"github.com/joho/godotenv"
 
+	"a.com/test/internal/common"
 	"a.com/test/internal/database"
 	logx "a.com/test/internal/httpx/logs"
 	"a.com/test/internal/httpx/middlewares"
@@ -23,9 +25,15 @@ func main() {
 
 	ctx := context.Background()
 
-	_, dbErr := database.Open(ctx)
+	db, dbErr := database.Open(ctx)
+	defer db.Close()
 	if dbErr != nil {
 		logx.Error("MAIN_DATABASE_ERROR", "err", dbErr)
+		os.Exit(1)
+	}
+
+	if _, gormErr := database.NewGorm(db); gormErr != nil {
+		logx.Error("MAIN_DATABASE_GORM_ERROR", "err", gormErr)
 		os.Exit(1)
 	}
 
@@ -35,10 +43,11 @@ func main() {
 	mux.HandleFunc("POST /list", middlewares.Config(list.SaveListHandler))
 	mux.HandleFunc("PUT /list/{id}", middlewares.Config(list.UpdateListHandler))
 	mux.HandleFunc("DELETE /list/{id}", middlewares.Config(list.DeleteListHandler))
+	config := common.GetMainConfigs()
 
-	logx.InfoString("MAIN", "running")
+	logx.InfoString("MAIN", fmt.Sprintf("running on port: %s", config.AppPort))
 	server := http.Server{
-		Addr:              ":8000",
+		Addr:              config.AppPort,
 		Handler:           mux,
 		ReadHeaderTimeout: 60 * time.Second,
 	}
@@ -46,6 +55,6 @@ func main() {
 	err := server.ListenAndServe()
 	if err != nil {
 		logx.Error("MAIN_SERVER_ERROR", "err", err)
-		os.Exit(1)
+		server.Shutdown(ctx)
 	}
 }

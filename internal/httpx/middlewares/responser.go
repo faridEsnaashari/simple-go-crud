@@ -28,8 +28,8 @@ func WithResponser(f func(w http.ResponseWriter, r *http.Request) Response) func
 			status = result.HttpStatus
 		}
 
-		w.WriteHeader(status)
 		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(status)
 		json.NewEncoder(w).Encode(result)
 
 		return result
