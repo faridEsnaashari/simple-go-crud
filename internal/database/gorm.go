@@ -13,10 +13,10 @@ import (
 var repo *gorm.DB
 
 func NewGorm(sqlDB *sql.DB) (*gorm.DB, error) {
-	log := logger.Default.LogMode(logger.Info)
+	log := logger.Default.LogMode(logger.Error)
 
-	if common.GetMainConfigs().HasLog != true {
-		log = logger.Default.LogMode(logger.Error)
+	if common.GetMainConfigs().HasLog {
+		log = logger.Default.LogMode(logger.Info)
 	}
 
 	initDb, err := gorm.Open(mysql.New(mysql.Config{Conn: sqlDB}), &gorm.Config{
