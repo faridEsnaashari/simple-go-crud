@@ -2,7 +2,6 @@ package list
 
 import (
 	"context"
-	"fmt"
 
 	"a.com/test/internal/database"
 )
@@ -28,17 +27,16 @@ func SaveListRepository(ctx context.Context, l List) (List, error) {
 	return l, nil
 }
 
-func UpdateListRepository(ctx context.Context, id int, l List) (int, error) {
+func UpdateListRepository(ctx context.Context, id int, l List) (List, error) {
 	repo := database.GetRepo()
 
 	r := repo.WithContext(ctx).Where("id = ?", id).Updates(&l).First(&l)
-	fmt.Println(l)
 
 	if r.Error != nil {
-		return 0, r.Error
+		return List{}, r.Error
 	}
 
-	return id, nil
+	return l, nil
 }
 
 func DeleteListRepository(ctx context.Context, id int) error {

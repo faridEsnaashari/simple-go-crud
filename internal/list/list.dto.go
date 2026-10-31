@@ -1,7 +1,8 @@
 package list
 
 import (
-	"strings"
+	"fmt"
+	"slices"
 
 	dtox "a.com/test/internal/httpx/dto"
 )
@@ -17,9 +18,9 @@ type UpdateListDto struct {
 }
 
 func (dto UpdateListDto) EnumValidation() *dtox.DtoValidationFailed {
-	if strings.Contains(string(dto.Status), string(ListStatusCreated)) ||
-		strings.Contains(string(dto.Status), string(ListStatusInProgress)) ||
-		strings.Contains(string(dto.Status), string(ListStatusDone)) {
+
+	fmt.Println()
+	if slices.Contains([]ListStatus{ListStatusCreated, ListStatusInProgress, ListStatusDone}, dto.Status) {
 		return nil
 	}
 

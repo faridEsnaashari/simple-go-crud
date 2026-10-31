@@ -28,14 +28,14 @@ func SaveListService(ctx context.Context, dto CreateListDto) (List, errorx.Handl
 	return r, errorx.HandledError{}
 }
 
-func UpdateListService(ctx context.Context, id int, dto UpdateListDto) (int, errorx.HandledError) {
+func UpdateListService(ctx context.Context, id int, dto UpdateListDto) (List, errorx.HandledError) {
 	r, e := UpdateListRepository(ctx, id, List{
 		Title:  dto.Title,
 		Status: dto.Status,
 	})
 
 	if e != nil {
-		return 0, errorx.DatabaseError(e)
+		return List{}, errorx.DatabaseError(e)
 	}
 
 	return r, errorx.HandledError{}

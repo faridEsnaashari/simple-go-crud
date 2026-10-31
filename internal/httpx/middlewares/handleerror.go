@@ -16,6 +16,12 @@ func WithHandleError[T any](
 
 		if err.ErrorStatus == http.StatusInternalServerError {
 			logx.Error("INTERNAL_ERROR", "err", err)
+			return Response{
+				Data:       "INTERNAL_ERROR",
+				Message:    "INTERNAL_ERROR",
+				Status:     FailedResponseStatus,
+				HttpStatus: err.ErrorStatus,
+			}
 		}
 
 		if err.ErrorStatus == http.StatusBadRequest {

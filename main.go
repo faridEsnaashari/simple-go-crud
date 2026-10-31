@@ -26,7 +26,6 @@ func main() {
 	ctx := context.Background()
 
 	db, dbErr := database.Open(ctx)
-	defer db.Close()
 	if dbErr != nil {
 		logx.Error("MAIN_DATABASE_ERROR", "err", dbErr)
 		os.Exit(1)
