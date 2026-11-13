@@ -38,3 +38,15 @@ func DatabaseError(err error) HandledError {
 		Message:     err.Error(),
 	}
 }
+
+func InternalError(err error) HandledError {
+	message := "internal"
+	if err != nil {
+		message = err.Error()
+	}
+	return HandledError{
+		ErrorStatus: http.StatusInternalServerError,
+		Reason:      "internal",
+		Message:     message,
+	}
+}

@@ -33,3 +33,12 @@ formatters:
     goimports:
       local-prefixes:
         - a.com/test
+
+severity:
+  default: warning
+  rules:
+    - linters:
+        - lll
+        - gofumpt
+        - goimports
+      severity: error

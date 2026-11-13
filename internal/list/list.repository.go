@@ -4,45 +4,55 @@ import (
 	"context"
 
 	"a.com/test/internal/database"
+
+	"gorm.io/gorm"
 )
 
-func ReadAllListRepository(ctx context.Context) ([]List, error) {
-	repo := database.GetRepo()
-	items := []List{}
-
-	if err := repo.WithContext(ctx).Order("id").Find(&items).Error; err != nil {
+func ReadAllListRepository(ctx context.Context, tx *gorm.DB) ([]List, error) {
+	repo := database.GetRepo[List](tx)
+	items, err := repo.Order("id").Find(ctx)
+	if err != nil {
 		return nil, err
 	}
 
 	return items, nil
 }
 
-func SaveListRepository(ctx context.Context, l List) (List, error) {
-	repo := database.GetRepo()
+func SaveListRepository(ctx context.Context, l List, tx *gorm.DB) (List, error) {
+	repo := database.GetRepo[List](tx)
 
-	if err := repo.WithContext(ctx).Create(&l).Error; err != nil {
+	if err := repo.Create(ctx, &l); err != nil {
 		return List{}, err
 	}
 
 	return l, nil
 }
 
-func UpdateListRepository(ctx context.Context, id int, l List) (List, error) {
-	repo := database.GetRepo()
+func UpdateListRepository(ctx context.Context, id int, l UpdateListDto, tx *gorm.DB) (List, error) {
+	repo := database.GetRepo[List](tx).Table("lists")
+	updateRepo := database.GetRepo[any](tx).Table("lists")
 
-	r := repo.WithContext(ctx).Where("id = ?", id).Updates(&l).First(&l)
-
-	if r.Error != nil {
-		return List{}, r.Error
+	_, e := updateRepo.Where("id=?", id).Updates(ctx, l)
+	if e != nil {
+		return List{}, e
 	}
 
-	return l, nil
+	list, err := repo.Where("id=?", id).First(ctx)
+	if err == gorm.ErrRecordNotFound {
+		return List{}, nil
+	}
+
+	if err != nil {
+		return List{}, err
+	}
+
+	return list, nil
 }
 
-func DeleteListRepository(ctx context.Context, id int) error {
-	repo := database.GetRepo()
+func DeleteListRepository(ctx context.Context, id int, tx *gorm.DB) error {
+	repo := database.GetRepo[List](tx)
 
-	if err := repo.WithContext(ctx).Where("id = ?", id).Delete(&List{}).Error; err != nil {
+	if _, err := repo.Where("id = ?", id).Delete(ctx); err != nil {
 		return err
 	}
 

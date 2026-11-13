@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"a.com/test/internal/common"
+
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
@@ -20,8 +21,9 @@ func NewGorm(sqlDB *sql.DB) (*gorm.DB, error) {
 	}
 
 	initDb, err := gorm.Open(mysql.New(mysql.Config{Conn: sqlDB}), &gorm.Config{
-		Logger:         log,
-		TranslateError: true,
+		Logger:                 log,
+		TranslateError:         true,
+		SkipDefaultTransaction: true,
 	})
 	if err != nil {
 		return nil, fmt.Errorf("open gorm: %w", err)
@@ -32,6 +34,14 @@ func NewGorm(sqlDB *sql.DB) (*gorm.DB, error) {
 	return repo, nil
 }
 
-func GetRepo() *gorm.DB {
+func GetTradiionalRepo(tx *gorm.DB) *gorm.DB {
+	if tx != nil {
+		return tx
+	}
+
 	return repo
+}
+
+func GetRepo[T any](tx *gorm.DB) gorm.Interface[T] {
+	return gorm.G[T](GetTradiionalRepo(tx))
 }

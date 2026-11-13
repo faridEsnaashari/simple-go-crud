@@ -19,7 +19,9 @@ type Response struct {
 	Data       any            `json:"data"`
 }
 
-func WithResponser(f func(w http.ResponseWriter, r *http.Request) Response) func(w http.ResponseWriter, r *http.Request) Response {
+func WithResponser(
+	f func(w http.ResponseWriter, r *http.Request) Response,
+) func(w http.ResponseWriter, r *http.Request) Response {
 	return func(w http.ResponseWriter, r *http.Request) Response {
 		result := f(w, r)
 
@@ -30,7 +32,13 @@ func WithResponser(f func(w http.ResponseWriter, r *http.Request) Response) func
 
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(status)
-		json.NewEncoder(w).Encode(result)
+		err := json.NewEncoder(w).Encode(result)
+		if err != nil {
+			return Response{
+				Status:     FailedResponseStatus,
+				HttpStatus: http.StatusInternalServerError,
+			}
+		}
 
 		return result
 	}

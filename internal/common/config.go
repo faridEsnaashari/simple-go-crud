@@ -11,7 +11,6 @@ type MainConfigs struct {
 }
 
 func GetMainConfigs() MainConfigs {
-
 	cnf := MainConfigs{AppPort: ":8000", HasLog: true}
 
 	if appPort := os.Getenv("APP_PORT"); appPort != "" {

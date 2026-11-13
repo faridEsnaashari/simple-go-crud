@@ -36,6 +36,7 @@ logs
 .temp
 .tmp
 tmp
+_tmp
 
 # Runtime data
 pids

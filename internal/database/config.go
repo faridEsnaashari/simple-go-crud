@@ -21,7 +21,12 @@ func GetDatabaseConfigs() (DatabaseConfig, error) {
 	mysqlUsername := os.Getenv("MYSQL_USERNAME")
 	mysqlDatabase := os.Getenv("MYSQL_DATABASE")
 
-	if mysqlPort == 0 || err != nil || mysqlHost == "" || mysqlPasswor == "" || mysqlUsername == "" || mysqlDatabase == "" {
+	if mysqlPort == 0 ||
+		err != nil ||
+		mysqlHost == "" ||
+		mysqlPasswor == "" ||
+		mysqlUsername == "" ||
+		mysqlDatabase == "" {
 		return DatabaseConfig{},
 			fmt.Errorf("wrong database confic")
 	}

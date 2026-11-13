@@ -12,7 +12,19 @@ type Request struct {
 }
 
 func (r *Request) Logger(status int, duration int64) {
-	logx.Info("INCOMMING_REQ", "method", r.Method, "route", r.Pattern, "path", r.URL.Path, "status", status, "duration", duration)
+	logx.Info(
+		"INCOMMING_REQ",
+		"method",
+		r.Method,
+		"route",
+		r.Pattern,
+		"path",
+		r.URL.Path,
+		"status",
+		status,
+		"duration",
+		duration,
+	)
 }
 
 func WithLogger(

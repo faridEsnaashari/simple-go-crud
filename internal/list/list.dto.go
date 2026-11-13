@@ -1,7 +1,6 @@
 package list
 
 import (
-	"fmt"
 	"slices"
 
 	dtox "a.com/test/internal/httpx/dto"
@@ -12,15 +11,16 @@ type CreateListDto struct {
 }
 
 type UpdateListDto struct {
-	ID     int        `json:"id"`
-	Title  string     `json:"title" validate:"min=3"`
-	Status ListStatus `json:"status" validate:"min=3"`
+	Title  *string     `json:"title" validate:"omitempty,min=3"`
+	Status *ListStatus `json:"status"`
 }
 
 func (dto UpdateListDto) EnumValidation() *dtox.DtoValidationFailed {
+	if dto.Status == nil {
+		return nil
+	}
 
-	fmt.Println()
-	if slices.Contains([]ListStatus{ListStatusCreated, ListStatusInProgress, ListStatusDone}, dto.Status) {
+	if slices.Contains([]ListStatus{ListStatusCreated, ListStatusInProgress, ListStatusDone}, *dto.Status) {
 		return nil
 	}
 
