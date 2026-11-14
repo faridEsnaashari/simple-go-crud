@@ -10,6 +10,7 @@ import (
 
 	"github.com/go-sql-driver/mysql"
 
+	"a.com/test/internal/common"
 	logx "a.com/test/internal/httpx/logs"
 )
 
@@ -17,6 +18,11 @@ func Open(ctx context.Context) (*sql.DB, error) {
 	c, cnfError := GetDatabaseConfigs()
 	if cnfError != nil {
 		return nil, cnfError
+	}
+
+	timeZone, timeZoneErr := time.LoadLocation(common.GetMainConfigs().TimeZone)
+	if timeZoneErr != nil {
+		return nil, timeZoneErr
 	}
 
 	cfg := mysql.NewConfig()
@@ -30,6 +36,7 @@ func Open(ctx context.Context) (*sql.DB, error) {
 	cfg.ReadTimeout = 30 * time.Second // per-query read timeout
 	cfg.WriteTimeout = 30 * time.Second
 	cfg.ClientFoundRows = true
+	cfg.Loc = timeZone
 
 	db, err := sql.Open("mysql", cfg.FormatDSN())
 	if err != nil {
@@ -50,7 +57,7 @@ func Open(ctx context.Context) (*sql.DB, error) {
 
 	logx.InfoString(
 		"DATABASE_CONNECTED",
-		fmt.Sprintf("connected to mysql: %v | %v | %v", c.MysqlHost, c.MysqlPort, c.MysqlDatabase),
+		fmt.Sprintf("connected to mysql: %v | %v | %v | %v", c.MysqlHost, c.MysqlPort, c.MysqlDatabase, timeZone),
 	)
 
 	return db, nil
